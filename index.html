@@ -33,15 +33,19 @@
       color: var(--navy);
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
     /* ── HEADER ── */
     header {
       background: linear-gradient(160deg, #0f172a 0%, #1e3a5f 55%, #0f3460 100%);
-      padding: 3.5rem 1.5rem 3rem;
+      padding: 2.5rem 1.25rem 2.25rem;
       text-align: center;
       position: relative;
       overflow: hidden;
+    }
+    @media (min-width: 580px) {
+      header { padding: 3.5rem 1.5rem 3rem; }
     }
     header::before {
       content: '';
@@ -78,16 +82,22 @@
     .container {
       max-width: 860px;
       margin: 0 auto;
-      padding: 2rem 1.25rem 5rem;
+      padding: 1.25rem .875rem 4rem;
+    }
+    @media (min-width: 580px) {
+      .container { padding: 2rem 1.25rem 5rem; }
     }
 
     /* ── CARDS ── */
     .card {
       background: var(--white);
       border-radius: .875rem;
-      padding: 1.5rem;
+      padding: 1.125rem 1rem;
       box-shadow: 0 1px 3px rgba(0,0,0,.06);
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.125rem;
+    }
+    @media (min-width: 580px) {
+      .card { padding: 1.5rem; margin-bottom: 1.5rem; }
     }
     .card-title {
       font-size: .68rem;
@@ -95,17 +105,20 @@
       text-transform: uppercase;
       letter-spacing: .1em;
       color: var(--faint);
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.125rem;
     }
 
     /* ── MORTGAGE INPUTS ── */
     .inputs-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
+      grid-template-columns: 1fr;
+      gap: .75rem;
+    }
+    @media (min-width: 420px) {
+      .inputs-grid { grid-template-columns: repeat(2, 1fr); gap: .875rem; }
     }
     @media (min-width: 580px) {
-      .inputs-grid { grid-template-columns: repeat(4, 1fr); }
+      .inputs-grid { grid-template-columns: repeat(4, 1fr); gap: 1rem; }
     }
 
     .igroup label {
@@ -162,13 +175,15 @@
 
     /* payoff hint */
     .payoff-hint {
-      margin-top: 1rem;
-      font-size: .8rem;
+      margin-top: .875rem;
+      font-size: .78rem;
       color: var(--slate);
       display: flex;
-      flex-wrap: wrap;
-      gap: .35rem .6rem;
-      align-items: center;
+      flex-direction: column;
+      gap: .35rem;
+    }
+    @media (min-width: 480px) {
+      .payoff-hint { flex-direction: row; flex-wrap: wrap; align-items: center; gap: .35rem .6rem; }
     }
     .payoff-hint .tag {
       display: inline-flex;
@@ -176,8 +191,8 @@
       gap: .3rem;
       background: #f1f5f9;
       border-radius: .4rem;
-      padding: .25rem .6rem;
-      font-size: .76rem;
+      padding: .28rem .65rem;
+      font-size: .75rem;
     }
     .tag .dot {
       width: 8px; height: 8px;
@@ -201,31 +216,34 @@
     }
 
     /* ── SLIDERS ── */
-    .srow { margin-bottom: 1.75rem; }
+    .srow { margin-bottom: 1.5rem; }
     .srow:last-child { margin-bottom: 0; }
     .shead {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
+      align-items: center;
       margin-bottom: .75rem;
+      gap: .5rem;
     }
     .sname {
-      font-size: .95rem;
+      font-size: .9rem;
       font-weight: 600;
       color: var(--navy);
+      line-height: 1.3;
     }
     .sname small {
+      display: block;
       font-weight: 400;
       color: var(--muted);
-      font-size: .78rem;
-      margin-left: .35rem;
+      font-size: .72rem;
+      margin-top: .1rem;
     }
     .sval {
       font-size: 1.45rem;
       font-weight: 700;
       color: var(--navy-mid);
       letter-spacing: -.025em;
-      min-width: 6rem;
+      flex-shrink: 0;
       text-align: right;
     }
     input[type=range] {
@@ -264,12 +282,15 @@
     .callout {
       background: linear-gradient(135deg, #059669 0%, #10b981 100%);
       border-radius: 1.25rem;
-      padding: 2.5rem 2rem;
+      padding: 2rem 1.25rem;
       text-align: center;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.125rem;
       box-shadow: 0 8px 32px rgba(16,185,129,.28), 0 2px 8px rgba(0,0,0,.08);
       position: relative;
       overflow: hidden;
+    }
+    @media (min-width: 580px) {
+      .callout { padding: 2.5rem 2rem; margin-bottom: 1.5rem; }
     }
     .callout::before {
       content: '';
@@ -306,17 +327,20 @@
     .metrics {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: .875rem;
-      margin-bottom: 1.5rem;
+      gap: .625rem;
+      margin-bottom: 1.125rem;
     }
     @media (min-width: 560px) {
-      .metrics { grid-template-columns: repeat(4, 1fr); }
+      .metrics { grid-template-columns: repeat(4, 1fr); gap: .875rem; margin-bottom: 1.5rem; }
     }
     .mcard {
       background: var(--white);
       border-radius: .875rem;
-      padding: 1.1rem 1rem;
+      padding: .875rem .875rem;
       box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    }
+    @media (min-width: 580px) {
+      .mcard { padding: 1.1rem 1rem; }
     }
     .mcard .lbl {
       font-size: .66rem;
