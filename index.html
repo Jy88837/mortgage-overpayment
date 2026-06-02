@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mortgage Overpayment Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:      #0f172a;
+      --navy-mid:  #1e3a5f;
+      --slate:     #475569;
+      --muted:     #64748b;
+      --faint:     #94a3b8;
+      --border:    #e2e8f0;
+      --bg:        #f1f5f9;
+      --white:     #ffffff;
+      --green:     #10b981;
+      --green-dk:  #059669;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--navy);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(160deg, #0f172a 0%, #1e3a5f 55%, #0f3460 100%);
+      padding: 3.5rem 1.5rem 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(16,185,129,.18) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .eyebrow {
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: .75rem;
+    }
+    header h1 {
+      font-size: clamp(1.7rem, 5vw, 2.6rem);
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -.035em;
+      line-height: 1.08;
+    }
+    header p {
+      margin-top: .65rem;
+      color: #94a3b8;
+      font-size: .95rem;
+      max-width: 480px;
+      margin-inline: auto;
+      line-height: 1.5;
+    }
+
+    /* ── LAYOUT ── */
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 5rem;
+    }
+
+    /* ── CALLOUT ── */
+    .callout {
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      border-radius: 1.25rem;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 8px 32px rgba(16,185,129,.28), 0 2px 8px rgba(0,0,0,.08);
+      position: relative;
+      overflow: hidden;
+    }
+    .callout::before {
+      content: '';
+      position: absolute;
+      top: -60%; right: -15%;
+      width: 320px; height: 320px;
+      background: rgba(255,255,255,.07);
+      border-radius: 50%;
+    }
+    .callout::after {
+      content: '';
+      position: absolute;
+      bottom: -50%; left: -8%;
+      width: 220px; height: 220px;
+      background: rgba(255,255,255,.04);
+      border-radius: 50%;
+    }
+    .callout-inner { position: relative; z-index: 1; }
+    #saving-amount {
+      font-size: clamp(2.4rem, 8vw, 4.2rem);
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -.04em;
+      line-height: 1;
+    }
+    #saving-label {
+      font-size: clamp(.85rem, 2.2vw, 1.05rem);
+      color: rgba(255,255,255,.85);
+      margin-top: .65rem;
+      line-height: 1.45;
+    }
+
+    /* ── METRICS ── */
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: .875rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (min-width: 560px) {
+      .metrics { grid-template-columns: repeat(4, 1fr); }
+    }
+    .mcard {
+      background: var(--white);
+      border-radius: .875rem;
+      padding: 1.1rem 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    }
+    .mcard .lbl {
+      font-size: .66rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      color: var(--faint);
+      margin-bottom: .3rem;
+    }
+    .mcard .val {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      color: var(--navy);
+    }
+    .mcard .sub {
+      font-size: .65rem;
+      color: var(--faint);
+      margin-top: .18rem;
+    }
+    .mcard.accent .val { color: var(--green-dk); }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--white);
+      border-radius: .875rem;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+      margin-bottom: 1.5rem;
+    }
+    .card-title {
+      font-size: .68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--faint);
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── SLIDERS ── */
+    .srow { margin-bottom: 1.75rem; }
+    .srow:last-child { margin-bottom: 0; }
+    .shead {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: .75rem;
+    }
+    .sname {
+      font-size: .95rem;
+      font-weight: 600;
+      color: var(--navy);
+    }
+    .sname small {
+      font-weight: 400;
+      color: var(--muted);
+      font-size: .78rem;
+      margin-left: .35rem;
+    }
+    .sval {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--navy-mid);
+      letter-spacing: -.025em;
+      min-width: 5.5rem;
+      text-align: right;
+    }
+    input[type=range] {
+      width: 100%;
+      height: 5px;
+      -webkit-appearance: none;
+      appearance: none;
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--navy-mid);
+      box-shadow: 0 1px 6px rgba(0,0,0,.22);
+      cursor: pointer;
+      transition: transform .12s;
+    }
+    input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+    input[type=range]::-moz-range-thumb {
+      width: 22px; height: 22px;
+      border: none;
+      border-radius: 50%;
+      background: var(--navy-mid);
+      cursor: pointer;
+    }
+    .srange {
+      display: flex;
+      justify-content: space-between;
+      font-size: .65rem;
+      color: var(--faint);
+      margin-top: .28rem;
+    }
+
+    /* ── CHART ── */
+    .chart-wrap {
+      position: relative;
+      height: 300px;
+    }
+
+    /* ── DETAILS ── */
+    .details-card {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+    .drow {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: .75rem;
+    }
+    @media (min-width: 500px) {
+      .drow { grid-template-columns: repeat(4, 1fr); }
+    }
+    .ditem .dl { font-size: .66rem; color: var(--faint); margin-bottom: .18rem; }
+    .ditem .dv { font-size: .9rem; font-weight: 600; color: var(--slate); }
+
+    /* ── FOOTNOTE ── */
+    .fn {
+      text-align: center;
+      font-size: .7rem;
+      color: var(--faint);
+      margin-top: 1.75rem;
+      line-height: 1.65;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Mortgage Calculator</div>
+  <h1>The Power of Overpayment</h1>
+  <p>See how a little extra each month — or a lump sum — cuts years off your mortgage through reverse compounding</p>
+</header>
+
+<div class="container">
+
+  <!-- Callout -->
+  <div class="callout">
+    <div class="callout-inner">
+      <div id="saving-amount">Move the sliders</div>
+      <div id="saving-label">below to see how much you can save on your mortgage</div>
+    </div>
+  </div>
+
+  <!-- Metrics -->
+  <div class="metrics">
+    <div class="mcard">
+      <div class="lbl">Without extra</div>
+      <div class="val" id="base-total">—</div>
+      <div class="sub">Total paid over life</div>
+    </div>
+    <div class="mcard">
+      <div class="lbl">With overpay</div>
+      <div class="val" id="over-total">—</div>
+      <div class="sub">Total paid over life</div>
+    </div>
+    <div class="mcard accent">
+      <div class="lbl">True saving</div>
+      <div class="val" id="true-saving">£0</div>
+      <div class="sub">Money back in pocket</div>
+    </div>
+    <div class="mcard accent">
+      <div class="lbl">Months cut off</div>
+      <div class="val" id="months-cut">0</div>
+      <div class="sub" id="years-cut">0 years earlier</div>
+    </div>
+  </div>
+
+  <!-- Sliders -->
+  <div class="card">
+    <div class="card-title">Adjust your overpayment</div>
+
+    <div class="srow">
+      <div class="shead">
+        <span class="sname">One-off lump sum <small>applied on day 1</small></span>
+        <span class="sval" id="lump-disp">£0</span>
+      </div>
+      <input type="range" id="lump" min="0" max="17000" step="500" value="0">
+      <div class="srange"><span>£0</span><span>£17,000</span></div>
+    </div>
+
+    <div class="srow">
+      <div class="shead">
+        <span class="sname">Extra per month <small>on top of regular payment</small></span>
+        <span class="sval" id="extra-disp">£0</span>
+      </div>
+      <input type="range" id="extra" min="0" max="500" step="25" value="0">
+      <div class="srange"><span>£0</span><span>£500 / mo</span></div>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="card">
+    <div class="card-title">Outstanding balance over time</div>
+    <div class="chart-wrap">
+      <canvas id="chart"></canvas>
+    </div>
+  </div>
+
+  <!-- Mortgage details -->
+  <div class="card details-card">
+    <div class="card-title">Mortgage details (example)</div>
+    <div class="drow">
+      <div class="ditem"><div class="dl">Opening balance</div><div class="dv">£200,000</div></div>
+      <div class="ditem"><div class="dl">Monthly payment</div><div class="dv" id="pmt-shown">…</div></div>
+      <div class="ditem"><div class="dl">Annual rate</div><div class="dv">4.31%</div></div>
+      <div class="ditem"><div class="dl">Remaining term</div><div class="dv">406 months</div></div>
+    </div>
+  </div>
+
+  <p class="fn">
+    Monthly reducing-balance amortisation. Figures are illustrative and do not constitute financial advice.<br>
+    Actual savings depend on your lender's early-repayment charges and any future rate changes.
+  </p>
+
+</div>
+
+<script>
+  const BALANCE    = 200000;
+  const RATE_ANN   = 0.0431;
+  const MAX_MONTHS = 406;
+  const r          = RATE_ANN / 12;
+
+  // Derive consistent monthly payment for £200 k over 406 months at 4.31%
+  const PMT = BALANCE * r / (1 - Math.pow(1 + r, -MAX_MONTHS));
+  document.getElementById('pmt-shown').textContent =
+    '£' + PMT.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+  // ── Amortisation ──────────────────────────────────────────────
+  function amortize(lump, extra) {
+    let bal = BALANCE - lump;
+    if (bal <= 0) return { months: 0, totalPaid: lump, bal: [0] };
+    let paid = lump;
+    const bal0 = [bal];
+    for (let m = 0; m < MAX_MONTHS && bal > 0.01; m++) {
+      const interest = bal * r;
+      const pay      = Math.min(PMT + extra, bal + interest);
+      bal = bal + interest - pay;
+      if (bal < 0.01) bal = 0;
+      paid += pay;
+      bal0.push(bal);
+    }
+    return { months: bal0.length - 1, totalPaid: paid, bal: bal0 };
+  }
+
+  const base = amortize(0, 0);
+
+  // ── Helpers ───────────────────────────────────────────────────
+  const fmt = n => '£' + Math.round(Math.abs(n)).toLocaleString('en-GB');
+
+  function setFill(el) {
+    const pct = ((+el.value - +el.min) / (+el.max - +el.min)) * 100;
+    el.style.background =
+      `linear-gradient(to right,#1e3a5f ${pct}%,#e2e8f0 ${pct}%)`;
+  }
+
+  // ── Chart ─────────────────────────────────────────────────────
+  const ctx = document.getElementById('chart').getContext('2d');
+  const chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: Array.from({ length: base.months + 1 }, (_, i) => i),
+      datasets: [
+        {
+          label: 'Without overpayment',
+          data: base.bal,
+          borderColor: '#94a3b8',
+          borderWidth: 1.5,
+          borderDash: [5, 4],
+          pointRadius: 0,
+          tension: 0.2,
+          fill: false,
+        },
+        {
+          label: 'With overpayment',
+          data: [...base.bal],
+          borderColor: '#10b981',
+          borderWidth: 2.5,
+          pointRadius: 0,
+          tension: 0.2,
+          fill: 'origin',
+          backgroundColor: 'rgba(16,185,129,.08)',
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 250 },
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          labels: {
+            boxWidth: 18,
+            usePointStyle: true,
+            pointStyleWidth: 14,
+            font: { size: 11, family: 'Inter' },
+            color: '#475569',
+          }
+        },
+        tooltip: {
+          backgroundColor: '#0f172a',
+          titleColor: '#94a3b8',
+          bodyColor: '#f1f5f9',
+          padding: 10,
+          callbacks: {
+            title: items => {
+              const m = items[0].dataIndex;
+              const y = Math.floor(m / 12), mo = m % 12;
+              return `Year ${y}` + (mo ? `, Month ${mo}` : '');
+            },
+            label: item =>
+              `  ${item.dataset.label}: £${Math.round(item.raw).toLocaleString('en-GB')}`
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'Years', color: '#94a3b8', font: { size: 11 } },
+          ticks: {
+            color: '#94a3b8',
+            font: { size: 10 },
+            callback: (_, i) => i % 60 === 0 ? (i / 12) + 'y' : ''
+          },
+          grid: { color: '#f1f5f9' }
+        },
+        y: {
+          min: 0,
+          title: { display: true, text: 'Balance', color: '#94a3b8', font: { size: 11 } },
+          ticks: {
+            color: '#94a3b8',
+            font: { size: 10 },
+            callback: v => '£' + (v / 1000).toFixed(0) + 'k'
+          },
+          grid: { color: '#f1f5f9' }
+        }
+      }
+    }
+  });
+
+  // ── Update ────────────────────────────────────────────────────
+  const lumpEl  = document.getElementById('lump');
+  const extraEl = document.getElementById('extra');
+
+  function update() {
+    const lump  = +lumpEl.value;
+    const extra = +extraEl.value;
+
+    setFill(lumpEl);
+    setFill(extraEl);
+
+    document.getElementById('lump-disp').textContent =
+      lump === 0 ? '£0' : '£' + lump.toLocaleString('en-GB');
+    document.getElementById('extra-disp').textContent =
+      extra === 0 ? '£0' : '+£' + extra + ' / mo';
+
+    const over       = amortize(lump, extra);
+    const saving     = base.totalPaid - over.totalPaid;
+    const monthsCut  = base.months - over.months;
+    const yearsCut   = (monthsCut / 12).toFixed(1);
+
+    // Callout
+    if (lump === 0 && extra === 0) {
+      document.getElementById('saving-amount').textContent = 'Move the sliders';
+      document.getElementById('saving-label').textContent  =
+        'below to see how much you can save on your mortgage';
+    } else {
+      const parts = [];
+      if (lump  > 0) parts.push('£' + lump.toLocaleString('en-GB') + ' upfront');
+      if (extra > 0) parts.push('£' + extra + '/mo extra');
+      document.getElementById('saving-amount').textContent = fmt(saving);
+      document.getElementById('saving-label').textContent  =
+        `saved by paying ${parts.join(' + ')} — mortgage gone ${yearsCut} years early`;
+    }
+
+    // Cards
+    document.getElementById('base-total').textContent  = fmt(base.totalPaid);
+    document.getElementById('over-total').textContent  = fmt(over.totalPaid);
+    document.getElementById('true-saving').textContent = fmt(Math.max(0, saving));
+    document.getElementById('months-cut').textContent  = Math.max(0, monthsCut);
+    document.getElementById('years-cut').textContent   =
+      Math.max(0, parseFloat(yearsCut)) + ' years earlier';
+
+    // Chart — pad overpayment series with zeros to match base length
+    const padded = [...over.bal];
+    while (padded.length < base.bal.length) padded.push(0);
+    chart.data.datasets[1].data = padded;
+    chart.update();
+  }
+
+  // Initialise
+  setFill(lumpEl);
+  setFill(extraEl);
+  document.getElementById('base-total').textContent = fmt(base.totalPaid);
+  document.getElementById('over-total').textContent = fmt(base.totalPaid);
+  update();
+
+  lumpEl.addEventListener('input',  update);
+  extraEl.addEventListener('input', update);
+</script>
+
+</body>
+</html>
