@@ -111,16 +111,17 @@
     /* ── MORTGAGE INPUTS ── */
     .inputs-grid {
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: .75rem;
     }
-    @media (min-width: 420px) {
-      .inputs-grid { grid-template-columns: repeat(2, 1fr); gap: .875rem; }
-    }
     @media (min-width: 580px) {
-      .inputs-grid { grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+      .inputs-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
     }
 
+    .igroup {
+      min-width: 0;
+      width: 100%;
+    }
     .igroup label {
       display: block;
       font-size: .72rem;
@@ -129,15 +130,12 @@
       margin-bottom: .4rem;
       letter-spacing: .02em;
     }
-    .igroup label span {
-      font-weight: 400;
-      color: var(--faint);
-      font-size: .65rem;
-    }
 
     .input-wrap {
       display: flex;
       align-items: center;
+      width: 100%;
+      min-width: 0;
       border: 1.5px solid var(--border);
       border-radius: .5rem;
       background: #f8fafc;
@@ -149,25 +147,27 @@
       background: var(--white);
     }
     .affix {
-      padding: 0 .6rem;
-      font-size: .85rem;
+      padding: 0 .45rem;
+      font-size: .8rem;
       font-weight: 600;
       color: var(--muted);
       background: transparent;
       white-space: nowrap;
       user-select: none;
+      flex-shrink: 0;
     }
     .input-wrap input[type=number] {
-      flex: 1;
+      flex: 1 1 0;
+      min-width: 0;
+      width: 0;
       border: none;
       outline: none;
       background: transparent;
       font-family: inherit;
-      font-size: .95rem;
+      font-size: .9rem;
       font-weight: 600;
       color: var(--navy);
-      padding: .6rem .5rem;
-      min-width: 0;
+      padding: .6rem .3rem;
       -moz-appearance: textfield;
     }
     .input-wrap input[type=number]::-webkit-inner-spin-button,
